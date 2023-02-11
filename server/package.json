@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "bin": "dist/index.cjs",
+  "scripts": {
+    "build": "rollup -c --environment BUILD:production",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "npm run build && pkg package.json --output ../src-tauri/binaries/node && cd .. && node ./scripts/move-binary.cjs"
+  },
+  "pkg": {
+    "scripts": "./node_modules/tiddlywiki/**/*.js",
+    "assets": "./node_modules/tiddlywiki/**/*",
+    "outputPath": "dist"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.2.0",
+    "fastify": "^4.12.0",
+    "tiddlywiki": "^5.2.5"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "eslint": "^8.33.0",
+    "nodemon": "^2.0.20",
+    "pkg": "^5.8.0",
+    "prettier": "^2.8.3",
+    "rollup": "^3.12.0"
+  }
+}

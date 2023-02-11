@@ -1,0 +1,83 @@
+{
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run package && npm run build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "tiddliwikirs",
+    "version": "0.0.1"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true,
+      "shell": {
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "binaries/node",
+            "sidecar": true
+          },
+          {
+            "name": "binaries/dav-server",
+            "sidecar": true
+          }
+        ]
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": ["binaries/node", "binaries/dav-server"],
+      "icon": [
+        "icons/icon-16x16.png",
+        "icons/icon-32x32.png",
+        "icons/icon-192x192.png",
+        "icons/icon-512x512.png",
+        "icons/icon.ico"
+      ],
+      "identifier": "com.tauri.tiddliwikirs",
+      "longDescription": "",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": [],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": "",
+        "wix": {
+          "template": "main.wxs"
+        }
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 600,
+        "width": 800,
+        "resizable": true,
+        "title": "tiddliwikirs",
+        "maximized": true,
+        "fileDropEnabled": false
+      }
+    ]
+  }
+}

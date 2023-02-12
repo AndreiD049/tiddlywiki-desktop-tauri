@@ -6,11 +6,28 @@ mod config;
 
 use std::path::Path;
 use config::{Config, WikiConfig};
-use tauri::api::process::Command;
+use tauri::api::process::{Command, CommandEvent};
 
 pub const APP_NAME: &str = "tiddlywikirs";
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+async fn serve_node_wiki(path: &str, port: u16) {
+    let path = Path::new(&path);
+    let parent_dir = path.parent().unwrap().to_str().unwrap();
+    let (mut rx, _child) = Command::new_sidecar("node")
+        .expect("Could not find binary sidecar 'node'")
+        .args(vec![parent_dir, "--listen", format!("port={}", port as u16).as_str(), "root-tiddler=$:/core/save/lazy-images"])
+        .spawn()
+        .expect(format!("Could not launch binary sidecar 'node' with parameters {}", parent_dir).as_str());
+
+    while let Some(event) = rx.recv().await {
+        if let CommandEvent::Stdout(line) = event {
+            if line.starts_with("Serving on") {
+                return;
+            }
+        }
+    }
+}
+
 #[tauri::command]
 async fn serve_wiki(path: String, wiki_type: String) -> Result<String, String>  {
     let config = Config::read();
@@ -19,13 +36,7 @@ async fn serve_wiki(path: String, wiki_type: String) -> Result<String, String>  
     if wiki_type == "node" {
         // kill previous running process
         kill_children();
-        let path = Path::new(&path);
-        let parent_dir = path.parent().unwrap().to_str().unwrap();
-        let (_rx, _child) = Command::new_sidecar("node")
-            .expect("Could not find binary sidecar 'node'")
-            .args(vec![parent_dir, "--listen", format!("port={}", port as u16).as_str(), "root-tiddler=$:/core/save/lazy-images"])
-            .spawn()
-            .expect(format!("Could not launch binary sidecar 'node' with parameters {}", parent_dir).as_str());
+        serve_node_wiki(&path, port.try_into().unwrap()).await;
         Ok(format!("http://localhost:{}", port))
     } else {
         // kill previous running process

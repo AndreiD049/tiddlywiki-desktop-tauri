@@ -1,6 +1,7 @@
 use std::{env, net::SocketAddr, path::PathBuf};
 
 use dav_server::warp::{dav_file, dav_dir};
+use warp::Filter;
 
 const USAGE: &str = "Usage: dav-server --file|--dir <file_or_directory> --port <port>";
 
@@ -28,7 +29,10 @@ async fn serve_file(file: PathBuf, port: u16) {
     let addr: SocketAddr = ([127, 0, 0, 1], port).into();
 
     println!("Listening on {:?} serving {:?}", addr, file.as_os_str());
-    let warpdav = dav_file(file);
+    let warpdav = dav_file(file)
+        .with(warp::reply::with::default_header("Access-Control-Allow-Origin", "*"))
+        .with(warp::reply::with::default_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"))
+        .with(warp::reply::with::default_header("Content-Security-Policy", "frame-ancestors http://localhost:1420"));
     warp::serve(warpdav).run(addr).await;
 }
 
